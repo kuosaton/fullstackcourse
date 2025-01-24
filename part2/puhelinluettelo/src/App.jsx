@@ -1,20 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Person from "./components/Person";
 import PersonForm from "./components/PersonForm";
 import Filter from "./components/Filter";
+import personService from "./services/person";
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: "Arto Hellas", number: "040-123456" },
-    { name: "Ada Lovelace", number: "39-44-5323523" },
-    { name: "Dan Abramov", number: "12-43-234345" },
-    { name: "Mary Poppendieck", number: "39-23-6423122" },
-    { name: "Joulupukki", number: "" },
-  ]);
-
+  const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filterKey, setKeyword] = useState("");
+
+  useEffect(() => {
+    personService.getAll().then((initialPersons) => {
+      setPersons(initialPersons);
+    });
+  }, []);
 
   const handleNewName = (event) => {
     setNewName(event.target.value);
@@ -26,6 +26,14 @@ const App = () => {
 
   const handleFilterKeyUpdate = (event) => {
     setKeyword(event.target.value);
+  };
+
+  const handleRemove = (event) => {
+    const id = event.target.value;
+    const person = persons.find((n) => n.id === id);
+    if (window.confirm(`Delete person? ${person.name}`)) {
+      personService.remove(id);
+    }
   };
 
   const personsToShow = persons.filter(
@@ -47,9 +55,11 @@ const App = () => {
       setNewName("");
       setNewNumber("");
     } else {
-      setPersons(persons.concat(personObject));
-      setNewName("");
-      setNewNumber("");
+      personService.create(personObject).then((returnedPerson) => {
+        setPersons(persons.concat(returnedPerson));
+        setNewName("");
+        setNewNumber("");
+      });
     }
   };
 
@@ -72,7 +82,13 @@ const App = () => {
 
       <h3>Numbers</h3>
       {personsToShow.map((person) => (
-        <Person key={person.name} name={person.name} number={person.number} />
+        <Person
+          key={person.id}
+          name={person.name}
+          number={person.number}
+          handleRemove={handleRemove}
+          id={person.id}
+        />
       ))}
     </div>
   );
