@@ -5,3 +5,5 @@ Content-Type: application/json
     "name": "Testi Tyyppi",
     "number": "040-0107722"
 }
+
+// Expected response: 200 OK

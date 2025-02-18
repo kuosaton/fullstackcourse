@@ -1,0 +1,39 @@
+### Get unknown endpoint
+GET http://localhost:3001/unknown
+// Expected response: 404 Not Found, error: unknown endpoint
+
+### Get person with nonexistent ID
+GET http://localhost:3001/api/persons/656789abcdef123456789012
+// Expected response: 404 Not Found
+
+### Get person with malformatted ID
+GET http://localhost:3001/api/persons/malformattedID
+// Expected response: 400 Bad Request, error: malformatted id
+
+### Create person with missing number
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+  "name": "Testi Tyyppi"
+}
+// Expected response: 400 Bad Request, error: Number missing
+
+### Create person with missing name
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+  "number": "123-456789"
+}
+// Expected response: 400 Bad Request, error: Name missing
+
+### Update nonexistent person
+PUT http://localhost:3001/api/persons/656789abcdef123456789012
+Content-Type: application/json
+
+{
+  "name": "Ei Olemassaoleva",
+  "number": "000-0000000"
+}
+// Expected: 404 Not Found, error: Person not found
