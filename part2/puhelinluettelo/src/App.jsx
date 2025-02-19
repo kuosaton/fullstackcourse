@@ -20,7 +20,7 @@ const App = () => {
     })
   }, [])
 
-  const showNotification = (setter, message, duration = 5000) => {
+  const showNotification = (setter, message, duration = 10000) => {
     setter(message)
     if (notificationTimeout) {
       clearTimeout(notificationTimeout)
@@ -44,43 +44,63 @@ const App = () => {
   const handleRemove = (event) => {
     const id = event.target.value
     const person = persons.find((n) => n.id === id)
+
     if (window.confirm(`Delete person? ${person.name}`)) {
       personService
         .remove(id)
         .then(() => {
-          setPersons(persons.filter((n) => n.id !== id))
-          showNotification(setSuccessMessage, `Deleted ${person.name}`)
+          setPersons((prevPersons) => prevPersons.filter((n) => n.id !== id))
+          showNotification(
+            setSuccessMessage,
+            `Deleted person ${person.name} successfully!`
+          )
         })
         .catch((error) => {
-          showNotification(
-            setErrorMessage,
-            `Person '${person.name}' was already removed from server`
-          )
+          let errorMessage = `Deleting person ${person.name} failed.`
 
-          setPersons(persons.filter((n) => n.id !== id))
+          if (error.response?.status === 404) {
+            errorMessage = `Deleting person ${person.name} failed: Person no longer exists.`
+            setPersons((prevPersons) => prevPersons.filter((n) => n.id !== id))
+          } else if (error.response?.data?.error) {
+            errorMessage = `Deleting person ${person.name} failed: ${error.response.data.error}`
+          }
+
+          showNotification(setErrorMessage, errorMessage)
+          console.log(errorMessage)
         })
     }
   }
 
-  const handleUpdate = (newName, newNumber) => {
-    const person = persons.find((n) => n.name === newName)
+  const handleUpdate = async (name, newNumber) => {
+    const person = persons.find((n) => n.name === name)
     const changedPerson = { ...person, number: newNumber }
     const id = person.id
 
-    personService
-      .update(id, changedPerson)
-      .then((returnedPerson) => {
-        setPersons(
-          persons.map((person) => (person.id !== id ? person : returnedPerson))
+    try {
+      const returnedPerson = await personService.update(id, changedPerson)
+
+      if (returnedPerson) {
+        setPersons((prevPersons) =>
+          prevPersons.map((p) => (p.id !== id ? p : returnedPerson))
         )
-      })
-      .catch((error) => {
         showNotification(
-          setErrorMessage,
-          `Person '${person.name}' was already removed from server`
+          setSuccessMessage,
+          `Updated ${name}'s number to ${newNumber} successfully!`
         )
-        setPersons(persons.filter((n) => n.id !== id))
-      })
+      }
+    } catch (error) {
+      let errorMessage = `Updating ${name}'s number to ${newNumber} failed.`
+
+      if (error.response?.status === 404) {
+        errorMessage = `Updating ${name}'s number to ${newNumber} failed: Person no longer exists.`
+        setPersons((prevPersons) => prevPersons.filter((n) => n.id !== id))
+      } else if (error.response?.data?.error) {
+        errorMessage = `Updating ${name}'s number to ${newNumber} failed: ${error.response.data.error}`
+      }
+
+      showNotification(setErrorMessage, errorMessage)
+      return
+    }
   }
 
   const addPerson = (event) => {
@@ -98,10 +118,6 @@ const App = () => {
         )
       ) {
         handleUpdate(newName, newNumber)
-        showNotification(
-          setSuccessMessage,
-          `Updated ${newName} number to ${newNumber}`
-        )
         setNewName("")
         setNewNumber("")
       }
@@ -110,14 +126,17 @@ const App = () => {
         .create(personObject)
         .then((returnedPerson) => {
           setPersons(persons.concat(returnedPerson))
-          showNotification(setSuccessMessage, `Added ${newName}`)
+          showNotification(
+            setSuccessMessage,
+            `Created person ${newName} successfully!`
+          )
           setNewName("")
           setNewNumber("")
         })
         .catch((error) => {
-          let errorMessage = "Person creation failed"
+          let errorMessage = `Creating person ${newName} failed.`
           if (error.response?.data?.error) {
-            errorMessage = `Note creation failed: ${error.response.data.error}`
+            errorMessage = `Creating person ${newName} failed: ${error.response.data.error}`
           }
           showNotification(setErrorMessage, errorMessage)
           console.log(errorMessage)
