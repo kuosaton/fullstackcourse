@@ -1,50 +1,48 @@
-const express = require("express")
-const morgan = require("morgan")
+const express = require('express')
+const morgan = require('morgan')
 const app = express()
 
-require("dotenv").config()
+require('dotenv').config()
 
-const Person = require("./models/person")
-
-let persons = []
+const Person = require('./models/person')
 
 app.use(express.json())
-app.use(morgan("tiny"))
+app.use(morgan('tiny'))
 
-const cors = require("cors")
+const cors = require('cors')
 app.use(cors())
 
-app.use(express.static("dist"))
+app.use(express.static('dist'))
 
 const unknownEndpoint = (request, response) => {
-  response.status(404).send({ error: "unknown endpoint" })
+  response.status(404).send({ error: 'unknown endpoint' })
 }
 
 const errorHandler = (error, request, response, next) => {
   console.error(error.message)
 
-  if (error.name === "CastError") {
-    return response.status(400).send({ error: "malformatted id" })
-  } else if (error.name === "ValidationError") {
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  } else if (error.name === 'ValidationError') {
     // Modifications for handling multiple validation errors
     const errorMessages = Object.values(error.errors).map((err) => err.message)
-    return response.status(400).json({ error: errorMessages.join(" ") })
+    return response.status(400).json({ error: errorMessages.join(' ') })
   }
 
   next(error)
 }
 
-app.get("/", (request, response) => {
-  response.send("<h1>Hello World!</h1>")
+app.get('/', (request, response) => {
+  response.send('<h1>Hello World!</h1>')
 })
 
-app.get("/api/persons", (request, response) => {
+app.get('/api/persons', (request, response) => {
   Person.find({}).then((persons) => {
     response.json(persons)
   })
 })
 
-app.get("/info", (request, response, next) => {
+app.get('/info', (request, response, next) => {
   const date = new Date()
   Person.find({})
     .then((persons) => {
@@ -57,7 +55,7 @@ app.get("/info", (request, response, next) => {
     .catch((error) => next(error))
 })
 
-app.get("/api/persons/:id", (request, response, next) => {
+app.get('/api/persons/:id', (request, response, next) => {
   Person.findById(request.params.id)
     .then((person) => {
       if (person) {
@@ -69,7 +67,7 @@ app.get("/api/persons/:id", (request, response, next) => {
     .catch((error) => next(error))
 })
 
-app.delete("/api/persons/:id", (request, response, next) => {
+app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndDelete(request.params.id)
     .then((person) => {
       if (person) {
@@ -81,7 +79,7 @@ app.delete("/api/persons/:id", (request, response, next) => {
     .catch((error) => next(error))
 })
 
-app.post("/api/persons", (request, response, next) => {
+app.post('/api/persons', (request, response, next) => {
   const { name, number } = request.body
 
   const person = new Person({ name, number })
@@ -94,7 +92,7 @@ app.post("/api/persons", (request, response, next) => {
     .catch((error) => next(error))
 })
 
-app.put("/api/persons/:id", async (request, response, next) => {
+app.put('/api/persons/:id', async (request, response, next) => {
   try {
     const { name, number } = request.body
     const person = await Person.findById(request.params.id)
