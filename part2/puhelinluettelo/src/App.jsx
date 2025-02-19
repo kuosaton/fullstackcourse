@@ -4,7 +4,6 @@ import PersonForm from "./components/PersonForm"
 import Filter from "./components/Filter"
 import personService from "./services/person"
 import Notification from "./components/Notification"
-import "./index.css"
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -13,6 +12,7 @@ const App = () => {
   const [filterKey, setKeyword] = useState("")
   const [errorMessage, setErrorMessage] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
+  const [notificationTimeout, setNotificationTimeout] = useState(null)
 
   useEffect(() => {
     personService.getAll().then((initialPersons) => {
@@ -21,10 +21,12 @@ const App = () => {
   }, [])
 
   const showNotification = (setter, message, duration = 5000) => {
-    setter((previous) => message)
-    setTimeout(() => {
-      setter((previous) => null)
-    }, duration)
+    setter(message)
+    if (notificationTimeout) {
+      clearTimeout(notificationTimeout)
+    }
+    const newTimeout = setTimeout(() => setter(null), duration)
+    setNotificationTimeout(newTimeout)
   }
 
   const handleNewName = (event) => {
@@ -40,7 +42,7 @@ const App = () => {
   }
 
   const handleRemove = (event) => {
-    const id = Number(event.target.value)
+    const id = event.target.value
     const person = persons.find((n) => n.id === id)
     if (window.confirm(`Delete person? ${person.name}`)) {
       personService
@@ -80,12 +82,6 @@ const App = () => {
         setPersons(persons.filter((n) => n.id !== id))
       })
   }
-
-  const personsToShow = persons.filter(
-    (person) =>
-      person.name.toLowerCase().includes(filterKey.toLowerCase()) ||
-      person.number.includes(filterKey)
-  )
 
   const addPerson = (event) => {
     event.preventDefault()
@@ -128,6 +124,12 @@ const App = () => {
         })
     }
   }
+
+  const personsToShow = persons.filter(
+    (person) =>
+      person.name.toLowerCase().includes(filterKey.toLowerCase()) ||
+      person.number.includes(filterKey)
+  )
 
   return (
     <div>
