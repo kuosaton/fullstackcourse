@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "deploy": "npm install && npm run build && rm -rf ../../part3/puhelinluettelo/dist && mv dist ../../part3/puhelinluettelo/dist",
     "lint": "eslint .",
     "preview": "vite preview"
   },
