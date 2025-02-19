@@ -94,18 +94,23 @@ app.post("/api/persons", (request, response, next) => {
     .catch((error) => next(error))
 })
 
-app.put("/api/persons/:id", (request, response, next) => {
-  const { name, number } = request.body
+app.put("/api/persons/:id", async (request, response, next) => {
+  try {
+    const { name, number } = request.body
+    const person = await Person.findById(request.params.id)
 
-  Person.findByIdAndUpdate(
-    request.params.id,
-    { name, number },
-    { new: true, runValidators: true, context: "query" }
-  )
-    .then((updatedPerson) => {
-      response.json(updatedPerson)
-    })
-    .catch((error) => next(error))
+    if (!person) {
+      return response.status(404).json({ error: `Person ${name} not found` })
+    }
+
+    person.name = name
+    person.number = number
+
+    const updatedPerson = await person.save()
+    response.json(updatedPerson)
+  } catch (error) {
+    next(error)
+  }
 })
 
 app.use(unknownEndpoint)
