@@ -28,7 +28,7 @@ const errorHandler = (error, request, response, next) => {
   } else if (error.name === "ValidationError") {
     // Modifications for handling multiple validation errors
     const errorMessages = Object.values(error.errors).map((err) => err.message)
-    return response.status(400).json({ error: errorMessages.join(", ") })
+    return response.status(400).json({ error: errorMessages.join(" ") })
   }
 
   next(error)
@@ -81,17 +81,10 @@ app.delete("/api/persons/:id", (request, response, next) => {
     .catch((error) => next(error))
 })
 
-const generateId = () => {
-  return `${Math.floor(Math.random() * 1000000)}`
-}
-
 app.post("/api/persons", (request, response, next) => {
-  const body = request.body
+  const { name, number } = request.body
 
-  const person = new Person({
-    name: body.name,
-    number: body.number,
-  })
+  const person = new Person({ name, number })
 
   person
     .save()
