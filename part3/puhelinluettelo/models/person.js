@@ -18,9 +18,16 @@ mongoose
 const personSchema = new mongoose.Schema({
   name: {
     type: String,
-    minlength: [3, 'Nimen minimipituus on 3 merkkiä.'],
-    maxlength: [30, 'Nimen maksimipituus on 30 merkkiä.'],
-    required: [true, 'Nimi on pakollinen syöte.'],
+    validate: {
+      validator: function (v) {
+        return /\S/.test(v)
+      },
+      message: (props) =>
+        `Invalid name input: ${props.value}. Names can contain any non-whitespace characters.`,
+    },
+    minlength: [3, 'The minimum length for a name is 3.'],
+    maxlength: [30, 'The maximum length for a name is 30.'],
+    required: [true, 'A name is required.'],
   },
   number: {
     type: String,
@@ -29,11 +36,11 @@ const personSchema = new mongoose.Schema({
         return /^\d{2,3}-\d{5,}$/.test(v)
       },
       message: (props) =>
-        `Puhelinnumero ${props.value} ei ole oikeassa muodossa. Sopivia muotoja ovat esimerkiksi 09-1234556 ja 040-22334455.`,
+        `Invalid phone number input: ${props.value}. Valid examples: 09-1234556 and 040-22334455.`,
     },
-    minlength: [8, 'Puhelinnumeron minimipituus on 3 merkkiä.'],
-    maxlength: [15, 'Puhelinnumeron maksimipituus on 15 merkkiä.'],
-    required: [true, 'Puhelinnumero on pakollinen syöte.'],
+    minlength: [8, 'The minimum length for a phone number is 8.'],
+    maxlength: [15, 'The maximum length for a phone number is 15.'],
+    required: [true, 'A phone number is required.'],
   },
 })
 
