@@ -7,153 +7,159 @@ import Notification from "./components/Notification"
 import "./index.css"
 
 const App = () => {
-   const [persons, setPersons] = useState([])
-   const [newName, setNewName] = useState("")
-   const [newNumber, setNewNumber] = useState("")
-   const [filterKey, setKeyword] = useState("")
-   const [errorMessage, setErrorMessage] = useState(null)
-   const [successMessage, setSuccessMessage] = useState(null)
+  const [persons, setPersons] = useState([])
+  const [newName, setNewName] = useState("")
+  const [newNumber, setNewNumber] = useState("")
+  const [filterKey, setKeyword] = useState("")
+  const [errorMessage, setErrorMessage] = useState(null)
+  const [successMessage, setSuccessMessage] = useState(null)
 
-   useEffect(() => {
-      personService.getAll().then((initialPersons) => {
-         setPersons(initialPersons)
-      })
-   }, [])
+  useEffect(() => {
+    personService.getAll().then((initialPersons) => {
+      setPersons(initialPersons)
+    })
+  }, [])
 
-   const handleNewName = (event) => {
-      setNewName(event.target.value)
-   }
+  const showNotification = (setter, message, duration = 5000) => {
+    setter((previous) => message)
+    setTimeout(() => {
+      setter((previous) => null)
+    }, duration)
+  }
 
-   const handleNewNumber = (event) => {
-      setNewNumber(event.target.value)
-   }
+  const handleNewName = (event) => {
+    setNewName(event.target.value)
+  }
 
-   const handleFilterKeyUpdate = (event) => {
-      setKeyword(event.target.value)
-   }
+  const handleNewNumber = (event) => {
+    setNewNumber(event.target.value)
+  }
 
-   const handleRemove = (event) => {
-      const id = event.target.value
-      const person = persons.find((n) => n.id === id)
-      if (window.confirm(`Delete person? ${person.name}`)) {
-         personService
-            .remove(id)
-            .then(() => {
-               setPersons(persons.filter((n) => n.id !== id))
-               setSuccessMessage(`Deleted ${person.name}`)
-               setTimeout(() => {
-                  setSuccessMessage(null)
-               }, 5000)
-            })
-            .catch((error) => {
-               setErrorMessage(
-                  `Person '${person.name}' was already removed from server`
-               )
-               setTimeout(() => {
-                  setErrorMessage(null)
-               }, 5000)
-               setPersons(persons.filter((n) => n.id !== id))
-            })
-      }
-   }
+  const handleFilterKeyUpdate = (event) => {
+    setKeyword(event.target.value)
+  }
 
-   const handleUpdate = (newName, newNumber) => {
-      const person = persons.find((n) => n.name === newName)
-      const changedPerson = { ...person, number: newNumber }
-      const id = person.id
-
+  const handleRemove = (event) => {
+    const id = Number(event.target.value)
+    const person = persons.find((n) => n.id === id)
+    if (window.confirm(`Delete person? ${person.name}`)) {
       personService
-         .update(id, changedPerson)
-         .then((returnedPerson) => {
-            setPersons(
-               persons.map((person) =>
-                  person.id !== id ? person : returnedPerson
-               )
-            )
-         })
-         .catch((error) => {
-            setErrorMessage(
-               `Person '${person.name}' was already removed from server`
-            )
-            setTimeout(() => {
-               setErrorMessage(null)
-            }, 5000)
-            setPersons(persons.filter((n) => n.id !== id))
-         })
-   }
+        .remove(id)
+        .then(() => {
+          setPersons(persons.filter((n) => n.id !== id))
+          showNotification(setSuccessMessage, `Deleted ${person.name}`)
+        })
+        .catch((error) => {
+          showNotification(
+            setErrorMessage,
+            `Person '${person.name}' was already removed from server`
+          )
 
-   const personsToShow = persons.filter(
-      (person) =>
-         person.name.toLowerCase().includes(filterKey.toLowerCase()) ||
-         person.number.includes(filterKey)
-   )
+          setPersons(persons.filter((n) => n.id !== id))
+        })
+    }
+  }
 
-   const addPerson = (event) => {
-      event.preventDefault()
+  const handleUpdate = (newName, newNumber) => {
+    const person = persons.find((n) => n.name === newName)
+    const changedPerson = { ...person, number: newNumber }
+    const id = person.id
 
-      const personObject = {
-         name: newName,
-         number: newNumber,
+    personService
+      .update(id, changedPerson)
+      .then((returnedPerson) => {
+        setPersons(
+          persons.map((person) => (person.id !== id ? person : returnedPerson))
+        )
+      })
+      .catch((error) => {
+        showNotification(
+          setErrorMessage,
+          `Person '${person.name}' was already removed from server`
+        )
+        setPersons(persons.filter((n) => n.id !== id))
+      })
+  }
+
+  const personsToShow = persons.filter(
+    (person) =>
+      person.name.toLowerCase().includes(filterKey.toLowerCase()) ||
+      person.number.includes(filterKey)
+  )
+
+  const addPerson = (event) => {
+    event.preventDefault()
+
+    const personObject = {
+      name: newName,
+      number: newNumber,
+    }
+
+    if (persons.some((person) => person.name === newName)) {
+      if (
+        window.confirm(
+          `${newName} is already added to phonebook, replace the old number with a new one?`
+        )
+      ) {
+        handleUpdate(newName, newNumber)
+        showNotification(
+          setSuccessMessage,
+          `Updated ${newName} number to ${newNumber}`
+        )
+        setNewName("")
+        setNewNumber("")
       }
+    } else {
+      personService
+        .create(personObject)
+        .then((returnedPerson) => {
+          setPersons(persons.concat(returnedPerson))
+          showNotification(setSuccessMessage, `Added ${newName}`)
+          setNewName("")
+          setNewNumber("")
+        })
+        .catch((error) => {
+          let errorMessage = "Person creation failed"
+          if (error.response?.data?.error) {
+            errorMessage = `Note creation failed: ${error.response.data.error}`
+          }
+          showNotification(setErrorMessage, errorMessage)
+          console.log(errorMessage)
+        })
+    }
+  }
 
-      if (persons.some((person) => person.name === newName)) {
-         if (
-            window.confirm(
-               `${newName} is already added to phonebook, replace the old number with a new one?`
-            )
-         ) {
-            handleUpdate(newName, newNumber)
-            setSuccessMessage(`Updated ${newName} number to ${newNumber}`)
-            setTimeout(() => {
-               setSuccessMessage(null)
-            }, 5000)
-            setNewName("")
-            setNewNumber("")
-         }
-      } else {
-         personService.create(personObject).then((returnedPerson) => {
-            setPersons(persons.concat(returnedPerson))
-            setSuccessMessage(`Added ${newName}`)
-            setTimeout(() => {
-               setSuccessMessage(null)
-            }, 5000)
-            setNewName("")
-            setNewNumber("")
-         })
-      }
-   }
+  return (
+    <div>
+      <h2>Phonebook</h2>
+      <Notification message={errorMessage} type={"error"} />
+      <Notification message={successMessage} type={"success"} />
+      <Filter
+        filterKey={filterKey}
+        handleFilterKeyUpdate={handleFilterKeyUpdate}
+      />
 
-   return (
-      <div>
-         <h2>Phonebook</h2>
-         <Notification message={errorMessage} type={"error"} />
-         <Notification message={successMessage} type={"success"} />
-         <Filter
-            filterKey={filterKey}
-            handleFilterKeyUpdate={handleFilterKeyUpdate}
-         />
+      <h3>Add new contact</h3>
+      <PersonForm
+        addPerson={addPerson}
+        newName={newName}
+        handleNewName={handleNewName}
+        newNumber={newNumber}
+        handleNewNumber={handleNewNumber}
+      />
 
-         <h3>Add new contact</h3>
-         <PersonForm
-            addPerson={addPerson}
-            newName={newName}
-            handleNewName={handleNewName}
-            newNumber={newNumber}
-            handleNewNumber={handleNewNumber}
-         />
-
-         <h3>Numbers</h3>
-         {personsToShow.map((person) => (
-            <Person
-               key={person.id}
-               name={person.name}
-               number={person.number}
-               handleRemove={handleRemove}
-               id={person.id}
-            />
-         ))}
-      </div>
-   )
+      <h3>Numbers</h3>
+      {personsToShow.map((person) => (
+        <Person
+          key={person.id}
+          name={person.name}
+          number={person.number}
+          handleRemove={handleRemove}
+          id={person.id}
+        />
+      ))}
+    </div>
+  )
 }
 
 export default App

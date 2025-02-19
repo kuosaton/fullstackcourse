@@ -6,7 +6,7 @@ const Person = ({ id, name, number, handleRemove }) => {
         delete
       </button>
     </p>
-  );
-};
+  )
+}
 
-export default Person;
+export default Person
