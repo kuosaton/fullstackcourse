@@ -1,15 +1,15 @@
-import { useState, useEffect } from "react"
-import Person from "./components/Person"
-import PersonForm from "./components/PersonForm"
-import Filter from "./components/Filter"
-import personService from "./services/person"
-import Notification from "./components/Notification"
+import { useState, useEffect } from 'react'
+import Person from './components/Person'
+import PersonForm from './components/PersonForm'
+import Filter from './components/Filter'
+import personService from './services/person'
+import Notification from './components/Notification'
 
 const App = () => {
   const [persons, setPersons] = useState([])
-  const [newName, setNewName] = useState("")
-  const [newNumber, setNewNumber] = useState("")
-  const [filterKey, setKeyword] = useState("")
+  const [newName, setNewName] = useState('')
+  const [newNumber, setNewNumber] = useState('')
+  const [filterKey, setKeyword] = useState('')
   const [errorMessage, setErrorMessage] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
   const [notificationTimeout, setNotificationTimeout] = useState(null)
@@ -20,7 +20,7 @@ const App = () => {
     })
   }, [])
 
-  const showNotification = (setter, message, duration = 10000) => {
+  const showNotification = (setter, message, duration = 5000) => {
     setter(message)
     if (notificationTimeout) {
       clearTimeout(notificationTimeout)
@@ -118,8 +118,8 @@ const App = () => {
         )
       ) {
         handleUpdate(newName, newNumber)
-        setNewName("")
-        setNewNumber("")
+        setNewName('')
+        setNewNumber('')
       }
     } else {
       personService
@@ -130,8 +130,8 @@ const App = () => {
             setSuccessMessage,
             `Created person ${newName} successfully!`
           )
-          setNewName("")
-          setNewNumber("")
+          setNewName('')
+          setNewNumber('')
         })
         .catch((error) => {
           let errorMessage = `Creating person ${newName} failed.`
@@ -153,8 +153,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={errorMessage} type={"error"} />
-      <Notification message={successMessage} type={"success"} />
+      <Notification message={errorMessage} type={'error'} />
+      <Notification message={successMessage} type={'success'} />
       <Filter
         filterKey={filterKey}
         handleFilterKeyUpdate={handleFilterKeyUpdate}
