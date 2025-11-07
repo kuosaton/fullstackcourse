@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types'
+
 const PersonForm = ({
   addPerson,
   newName,
@@ -20,6 +22,13 @@ const PersonForm = ({
       </form>
     </div>
   )
+}
+PersonForm.propTypes = {
+  addPerson: PropTypes.func,
+  newName: PropTypes.string,
+  handleNewName: PropTypes.func,
+  newNumber: PropTypes.string,
+  handleNewNumber: PropTypes.func,
 }
 
 export default PersonForm

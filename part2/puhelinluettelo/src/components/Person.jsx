@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types'
+
 const Person = ({ id, name, number, handleRemove }) => {
   return (
     <p>
@@ -7,6 +9,12 @@ const Person = ({ id, name, number, handleRemove }) => {
       </button>
     </p>
   )
+}
+Person.propTypes = {
+  id: PropTypes.string,
+  name: PropTypes.string,
+  number: PropTypes.string,
+  handleRemove: PropTypes.func,
 }
 
 export default Person

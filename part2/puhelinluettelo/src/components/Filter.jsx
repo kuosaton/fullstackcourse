@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types'
+
 const Filter = ({ filterKey, handleFilterKeyUpdate }) => {
   return (
     <div>
@@ -5,6 +7,10 @@ const Filter = ({ filterKey, handleFilterKeyUpdate }) => {
       <input value={filterKey} onChange={handleFilterKeyUpdate} />
     </div>
   )
+}
+Filter.propTypes = {
+  filterKey: PropTypes.string,
+  handleFilterKeyUpdate: PropTypes.func,
 }
 
 export default Filter
