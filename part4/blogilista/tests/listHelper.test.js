@@ -53,7 +53,7 @@ describe('total likes', () => {
       title: 'TDD harms architecture',
       author: 'Robert C. Martin',
       url: 'http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html',
-      likes: 0,
+      likes: 12,
       __v: 0,
     },
     {
@@ -71,8 +71,17 @@ describe('total likes', () => {
     assert.strictEqual(result, 5)
   })
 
+  test('blog with most likes is correctly returned with one blog', () => {
+    const result = listHelper.favoriteBlog(listWithOneBlog)
+    assert.deepStrictEqual(result._id, '5a422aa71b54a676234d17f8')
+  })
+
   test('multiple blog likes are calculated correctly', () => {
     const result = listHelper.totalLikes(listWithManyBlogs)
-    assert.strictEqual(result, 36)
+    assert.strictEqual(result, 48)
+  })
+  test('blog with most likes is correctly returned with multiple blogs', () => {
+    const result = listHelper.favoriteBlog(listWithManyBlogs)
+    assert.deepStrictEqual(result._id, '5a422b3a1b54a676234d17f9')
   })
 })
