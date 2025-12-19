@@ -58,3 +58,28 @@ test('a valid blog can be added ', async () => {
 after(async () => {
   await mongoose.connection.close()
 })
+
+test('adding a blog without specifying likes defaults to 0', async () => {
+  const newBlog = {
+    title: 'Physics 2',
+    author: 'Albert Einstein',
+    url: 'example.com/albert-new-cool-paper-abstract.html',
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const blogsAtEnd = await helper.blogsInDb()
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1)
+
+  const likes = blogsAtEnd.map((blog) => blog.likes)
+  console.log(typeof likes)
+  assert.strictEqual(likes.at(-1), 0)
+})
+
+after(async () => {
+  await mongoose.connection.close()
+})
