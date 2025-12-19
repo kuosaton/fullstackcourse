@@ -52,7 +52,7 @@ const listWithManyBlogs = [
     title: 'TDD harms architecture',
     author: 'Robert C. Martin',
     url: 'http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html',
-    likes: 12,
+    likes: 0,
     __v: 0,
   },
   {
@@ -73,19 +73,19 @@ describe('total likes', () => {
 
   test('multiple blog likes are calculated correctly', () => {
     const result = listHelper.totalLikes(listWithManyBlogs)
-    assert.strictEqual(result, 48)
+    assert.strictEqual(result, 36)
   })
 })
 
 describe('favorite blog', () => {
   test('blog with most likes is correctly returned with one blog', () => {
     const result = listHelper.favoriteBlog(listWithOneBlog)
-    assert.deepStrictEqual(result._id, '5a422aa71b54a676234d17f8')
+    assert.deepStrictEqual(result.title, 'Go To Statement Considered Harmful')
   })
 
   test('blog with most likes is correctly returned with multiple blogs', () => {
     const result = listHelper.favoriteBlog(listWithManyBlogs)
-    assert.deepStrictEqual(result._id, '5a422b3a1b54a676234d17f9')
+    assert.deepStrictEqual(result.title, 'Canonical string reduction')
   })
 })
 
@@ -98,5 +98,17 @@ describe('author with most blog posts', () => {
   test('author with most blog posts is correctly returned with multiple blogs', () => {
     const result = listHelper.mostBlogs(listWithManyBlogs)
     assert.deepStrictEqual(result, { author: 'Robert C. Martin', blogs: 3 })
+  })
+})
+
+describe('author with most likes', () => {
+  test('author with most likes is correctly returned with one blog', () => {
+    const result = listHelper.mostLikes(listWithOneBlog)
+    assert.deepStrictEqual(result, { author: 'Edsger W. Dijkstra', likes: 5 })
+  })
+
+  test('author with most likes is correctly returned with multiple blogs', () => {
+    const result = listHelper.mostLikes(listWithManyBlogs)
+    assert.deepStrictEqual(result, { author: 'Edsger W. Dijkstra', likes: 17 })
   })
 })
