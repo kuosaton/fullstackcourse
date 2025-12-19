@@ -1,5 +1,5 @@
 const assert = require('node:assert')
-const { test, after, beforeEach, afterEach, describe } = require('node:test')
+const { test, after, beforeEach, describe } = require('node:test')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
@@ -109,6 +109,30 @@ describe('when there are initially blogs saved', () => {
       const ids = blogsAtEnd.map((blog) => blog.id)
       assert(!ids.includes(blogToDelete.id))
       assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
+    })
+  })
+
+  describe('updating a blog', () => {
+    test('succeeds with code 200 if id is valid', async () => {
+      const blogsAtStart = await helper.blogsInDb()
+      const blogToUpdate = blogsAtStart[0]
+
+      const updatedBlog = {
+        title: 'Physics 2',
+        author: 'Albert Einstein',
+        url: 'example.com/albert-new-cool-paper-revised-abstract.html',
+        likes: 267,
+      }
+      await api
+        .put(`/api/blogs/${blogToUpdate.id}`)
+        .send(updatedBlog)
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      const blogsAtEnd = await helper.blogsInDb()
+      const oldUrl = blogsAtStart.map((blog) => blog.url)
+      const newUrl = blogsAtEnd.map((blog) => blog.url)
+      assert.notEqual(oldUrl, newUrl)
     })
   })
 })
