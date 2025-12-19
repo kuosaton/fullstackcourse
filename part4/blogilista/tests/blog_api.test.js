@@ -80,6 +80,24 @@ test('adding a blog without specifying likes defaults to 0', async () => {
   assert.strictEqual(likes.at(-1), 0)
 })
 
+test('adding a blog without specifying title returns code 400', async () => {
+  const newBlog = {
+    author: 'Albert Einstein',
+    url: 'example.com/albert-new-cool-paper-abstract.html',
+  }
+
+  await api.post('/api/blogs').send(newBlog).expect(400)
+})
+
+test('adding a blog without specifying url returns code 400', async () => {
+  const newBlog = {
+    title: 'Physics 2',
+    author: 'Albert Einstein',
+  }
+
+  await api.post('/api/blogs').send(newBlog).expect(400)
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
