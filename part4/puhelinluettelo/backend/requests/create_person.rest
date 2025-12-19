@@ -1,0 +1,9 @@
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+    "name": "Testi Hyypiö",
+    "number": "040-0130772"
+}
+
+// Expected response: 200 OK

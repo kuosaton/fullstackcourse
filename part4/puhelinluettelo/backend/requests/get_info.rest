@@ -1,0 +1,2 @@
+GET http://localhost:3001/info
+// Expected response: 200 OK and info page with valid count and date
