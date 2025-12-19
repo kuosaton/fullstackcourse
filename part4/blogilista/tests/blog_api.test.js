@@ -34,6 +34,27 @@ test('blogs are returned with id as the identifying field', async () => {
   })
 })
 
+test('a valid blog can be added ', async () => {
+  const newBlog = {
+    title: 'Physics 2',
+    author: 'Albert Einstein',
+    url: 'example.com/albert-new-cool-paper-abstract.html',
+    likes: 267,
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const blogsAtEnd = await helper.blogsInDb()
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1)
+
+  const title = blogsAtEnd.map((blog) => blog.title)
+  assert(title.includes('Physics 2'))
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
