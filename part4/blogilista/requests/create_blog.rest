@@ -1,11 +1,12 @@
-POST http://localhost:3001/api/blogs 
+POST http://localhost:3001/api/blogs
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3RpMTIiLCJpZCI6IjY5NDVjNjY3YzIyOGU0MjhmYjdkNzVmMCIsImlhdCI6MTc2NjE4MTA3MSwiZXhwIjoxNzY2MTg0NjcxfQ.PVu547us04FTByphBeAV6VnkZpci6QDrCZ51IjZFTgI
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3RpMTMiLCJpZCI6IjY5NDVkNDAwMTE4NGRiNGI4NTc2Yjk2MCIsImlhdCI6MTc2NjE4NTQwNiwiZXhwIjoxNzY2MTg5MDA2fQ.ArpOhEZD02AdxZxjPXsAzxrSxSP0FUZoMF9c8FCj3nc
 
 {
-    "title": "Testiblogi",
+    "title": "Testiblogi13",
     "author": "Testi Käyttäjä",
     "url": "example.com",
     "likes": 9000,
-    "userId": "6945c667c228e428fb7d75f0"
+    "userId": "6945d4001184db4b8576b960"
+
 }

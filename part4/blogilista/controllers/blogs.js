@@ -24,15 +24,25 @@ blogsRouter.get('/:id', async (request, response, next) => {
 blogsRouter.post('/', async (request, response, next) => {
   try {
     const { title, author, url, likes } = request.body
+    console.log('verifying token...')
 
     if (!request.token) {
       return response.status(401).json({ error: 'token missing' })
     }
+
+    console.log('verifying token...')
     const decodedToken = jwt.verify(request.token, process.env.SECRET)
     if (!decodedToken.id) {
       return response.status(401).json({ error: 'token invalid' })
     }
+    console.log('token ok:', decodedToken.id)
+    console.log(
+      'mongoose readyState:',
+      require('mongoose').connection.readyState
+    )
+    console.log('about to find user...')
     const user = await User.findById(decodedToken.id)
+    console.log('user found:', !!user)
 
     if (!user) {
       return response.status(400).json({ error: 'UserId missing or not valid' })
@@ -67,8 +77,28 @@ blogsRouter.post('/', async (request, response, next) => {
 
 blogsRouter.delete('/:id', async (request, response, next) => {
   try {
+    if (!request.token) {
+      return response.status(401).json({ error: 'token missing' })
+    }
+
+    const decodedToken = jwt.verify(request.token, process.env.SECRET)
+    if (!decodedToken.id) {
+      return response.status(401).json({ error: 'token invalid' })
+    }
+
+    const blog = await Blog.findById(request.params.id)
+    if (!blog) {
+      return response.status(404).end()
+    }
+
+    if (blog.user.toString() !== decodedToken.id.toString()) {
+      return response
+        .status(403)
+        .json({ error: 'only the creator can delete a blog' })
+    }
+
     await Blog.findByIdAndDelete(request.params.id)
-    response.status(204).end()
+    return response.status(204).end()
   } catch (exception) {
     next(exception)
   }
