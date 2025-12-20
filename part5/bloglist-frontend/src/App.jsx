@@ -3,19 +3,26 @@ import Blog from './components/Blog'
 import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import BlogForm from './components/BlogForm'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
+
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
+
   const [notification, setNotification] = useState({
     message: null,
     isSuccess: true,
   })
+
+  const [blogFormVisible, setBlogFormVisible] = useState(false)
+  const hideWhenVisible = { display: blogFormVisible ? 'none' : '' }
+  const showWhenVisible = { display: blogFormVisible ? '' : 'none' }
 
   const showNotification = (message, isSuccess) => {
     console.log(message, isSuccess)
@@ -56,6 +63,7 @@ const App = () => {
       setTitle('')
       setAuthor('')
       setUrl('')
+      setBlogFormVisible(false)
 
       showNotification(`Successfully created blog ${returnedBlog.title}!`, true)
     } catch (error) {
@@ -88,6 +96,7 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
+      setBlogFormVisible(false)
 
       showNotification(`Successfully logged in!`, true)
     } catch (error) {
@@ -141,36 +150,6 @@ const App = () => {
     </form>
   )
 
-  const blogForm = () => (
-    <form onSubmit={addBlog}>
-      <div>
-        <label>
-          Title:
-          <input
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-          />
-        </label>
-      </div>
-      <div>
-        <label>
-          Author:
-          <input
-            value={author}
-            onChange={(event) => setAuthor(event.target.value)}
-          />
-        </label>
-      </div>
-      <div>
-        <label>
-          Url:
-          <input value={url} onChange={(event) => setUrl(event.target.value)} />
-        </label>
-      </div>
-      <button type="submit">Submit</button>
-    </form>
-  )
-
   return (
     <div>
       <h1>Blogs</h1>
@@ -186,8 +165,24 @@ const App = () => {
           <form onSubmit={handleLogout}>
             <button type="submit">logout</button>
           </form>
-          <h2>Create blog</h2>
-          {blogForm()}
+          <div style={hideWhenVisible}>
+            <button onClick={() => setBlogFormVisible(true)}>
+              create new blog
+            </button>
+          </div>
+          <div style={showWhenVisible}>
+            <h2>Create new blog</h2>
+            <BlogForm
+              onSubmit={addBlog}
+              title={title}
+              author={author}
+              url={url}
+              onTitleChange={(event) => setTitle(event.target.value)}
+              onAuthorChange={(event) => setAuthor(event.target.value)}
+              onUrlChange={(event) => setUrl(event.target.value)}
+            />
+            <button onClick={() => setBlogFormVisible(false)}>cancel</button>
+          </div>
         </div>
       )}
       <ul>
