@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, onLike }) => {
   const [visible, setVisible] = useState(false)
 
   const blogStyle = {
@@ -17,20 +17,25 @@ const Blog = ({ blog }) => {
   return (
     <div style={blogStyle}>
       <div style={hideWhenVisible}>
-        {blog.title} <span>by {blog.author}</span>{' '}
+        {blog.title}
         <button onClick={() => setVisible(true)}>view</button>
       </div>
 
       <div style={showWhenVisible}>
         <div>
-          <strong>{blog.title}</strong> <span>by {blog.author}</span>{' '}
-          <button onClick={() => setVisible(false)}>hide</button>
+          <div>
+            {' '}
+            {blog.title} <button onClick={() => setVisible(false)}>hide</button>
+          </div>
+          <div>{blog.url}</div>
+          <div>
+            likes {blog.likes} {''}
+            <button type="button" onClick={onLike}>
+              like
+            </button>
+          </div>
+          <div>{blog.author}</div>
         </div>
-
-        <div>
-          {blog.likes} likes <button type="button">like</button>
-        </div>
-        <div>available at: {blog.url}</div>
       </div>
     </div>
   )
