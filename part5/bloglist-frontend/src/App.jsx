@@ -6,16 +6,35 @@ import loginService from './services/login'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [errorMessage, setErrorMessage] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
+  const [notification, setNotification] = useState({
+    message: null,
+    isSuccess: true,
+  })
+
+  const showNotification = (message, isSuccess) => {
+    console.log(message, isSuccess)
+    setNotification({ message, isSuccess })
+    setTimeout(() => {
+      setNotification({ message: null, isSuccess: true })
+    }, 5000)
+  }
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs))
+    const fetchBlogs = async () => {
+      try {
+        const blogs = await blogService.getAll()
+        setBlogs(blogs)
+      } catch (error) {
+        showNotification(`Failed to fetch blogs due to ${error}`, false)
+      }
+    }
+    fetchBlogs()
   }, [])
 
   useEffect(() => {
@@ -27,18 +46,34 @@ const App = () => {
     }
   }, [])
 
-  const addBlog = (event) => {
+  const addBlog = async (event) => {
     event.preventDefault()
+    try {
+      const blogObject = { title, author, url, likes: 0 }
+      const returnedBlog = await blogService.create(blogObject)
 
-    const blogObject = { title, author, url, likes: 0 }
-
-    blogService.create(blogObject).then((returnedBlog) => {
       setBlogs(blogs.concat(returnedBlog))
-
       setTitle('')
       setAuthor('')
       setUrl('')
-    })
+
+      showNotification(`Successfully created blog ${returnedBlog.title}!`, true)
+    } catch (error) {
+      const status = error.response?.status
+      const backendMessage = error.response?.data?.error
+
+      if (status === 400) {
+        showNotification(
+          `Failed to create blog: Invalid input. ${backendMessage}`,
+          false
+        )
+      } else {
+        showNotification(
+          `Failed to create blog: Error code ${status}, reason: ${backendMessage}`,
+          false
+        )
+      }
+    }
   }
 
   const handleLogin = async (event) => {
@@ -49,22 +84,35 @@ const App = () => {
 
       window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
       blogService.setToken(user.token)
+
       setUser(user)
       setUsername('')
       setPassword('')
-    } catch {
-      setErrorMessage('wrong credentials')
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
+
+      showNotification(`Successfully logged in!`, true)
+    } catch (error) {
+      const status = error.response?.status
+      const backendMessage = error.response?.data?.error
+
+      if (status === 401) {
+        showNotification(
+          `Login failed due to incorrect credentials: ${backendMessage}`,
+          false
+        )
+      } else {
+        showNotification(
+          `Login failed: Error code ${status}, reason: ${backendMessage}`,
+          false
+        )
+      }
     }
   }
 
-  const handleLogout = (e) => {
-    e.preventDefault()
-    window.localStorage.clear()
+  const handleLogout = (event) => {
+    event.preventDefault()
+    localStorage.removeItem('loggedBlogappUser')
     setUser(null)
-    blogService.setToken(null)
+    showNotification(`You have logged out.`, true)
   }
 
   const loginForm = () => (
@@ -126,7 +174,10 @@ const App = () => {
   return (
     <div>
       <h1>Blogs</h1>
-      <Notification message={errorMessage} />
+      <Notification
+        message={notification.message}
+        isSuccess={notification.isSuccess}
+      />
 
       {!user && loginForm()}
       {user && (
@@ -141,8 +192,8 @@ const App = () => {
       )}
       <ul>
         {blogs.map((blog) => (
-          <li>
-            <Blog key={blog.id} blog={blog} />
+          <li key={blog.id}>
+            <Blog blog={blog} />
           </li>
         ))}
       </ul>
