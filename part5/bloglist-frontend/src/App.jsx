@@ -54,20 +54,26 @@ const App = () => {
   }, [])
 
   const handleLike = async (blog) => {
+    const blogUserId = blog.user?.id || blog.user?._id || blog.user
+
     const updatedBlogData = {
-      user: blog.user.id,
+      user: blogUserId,
       likes: blog.likes + 1,
       author: blog.author,
       title: blog.title,
       url: blog.url,
     }
 
-    const updatedBlog = await blogService.update(blog.id, updatedBlogData)
+    const updatedBlogFromServer = await blogService.update(
+      blog.id,
+      updatedBlogData
+    )
+    const updatedBlogLocal = { ...updatedBlogFromServer, user: blog.user }
 
-    setBlogs(blogs.map((b) => (b.id === blog.id ? updatedBlog : b)))
+    setBlogs(blogs.map((b) => (b.id === blog.id ? updatedBlogLocal : b)))
   }
 
-  const addBlog = async (event) => {
+  const handleAdd = async (event) => {
     event.preventDefault()
     try {
       const blogObject = { title, author, url, likes: 0 }
@@ -95,6 +101,20 @@ const App = () => {
           false
         )
       }
+    }
+  }
+
+  const handleDelete = async (blog) => {
+    const ok = window.confirm(`Delete blog "${blog.title}" by ${blog.author}?`)
+    if (!ok) return
+
+    try {
+      await blogService.remove(blog.id)
+      setBlogs(blogs.filter((b) => b.id !== blog.id))
+      showNotification(`Successfully deleted ${blog.title}`, true)
+    } catch (error) {
+      const message = error.response?.data?.error
+      showNotification(`Delete failed: ${message}`, false)
     }
   }
 
@@ -187,7 +207,7 @@ const App = () => {
           <div style={showWhenVisible}>
             <h2>Create new blog</h2>
             <BlogForm
-              onSubmit={addBlog}
+              onSubmit={handleAdd}
               title={title}
               author={author}
               url={url}
@@ -200,11 +220,18 @@ const App = () => {
         </div>
       )}
       <ul>
-        {blogs.map((blog) => (
-          <li key={blog.id}>
-            <Blog blog={blog} onLike={() => handleLike(blog)} />
-          </li>
-        ))}
+        {[...blogs]
+          .sort((blog_a, blog_b) => blog_b.likes - blog_a.likes)
+          .map((blog) => (
+            <li key={blog.id}>
+              <Blog
+                blog={blog}
+                user={user}
+                onLike={() => handleLike(blog)}
+                onDelete={() => handleDelete(blog)}
+              />
+            </li>
+          ))}
       </ul>
     </div>
   )
