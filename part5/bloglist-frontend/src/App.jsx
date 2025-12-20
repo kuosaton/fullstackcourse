@@ -73,8 +73,7 @@ const App = () => {
     setBlogs(blogs.map((b) => (b.id === blog.id ? updatedBlogLocal : b)))
   }
 
-  const handleAdd = async (event) => {
-    event.preventDefault()
+  const handleAdd = async ({ title, author, url }) => {
     try {
       const blogObject = { title, author, url, likes: 0 }
       const returnedBlog = await blogService.create(blogObject)

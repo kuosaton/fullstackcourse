@@ -28,9 +28,12 @@ test('blog displays author, url, and likes when expanded', async () => {
   }
 
   const user = userEvent.setup()
+
   render(<Blog blog={blog} user={{ id: '123' }} />)
 
-  await user.click(screen.getByText('view'))
+  const viewButton = screen.getByText('view')
+
+  await user.click(viewButton)
 
   expect(screen.getByText(blog.author)).toBeVisible()
   expect(screen.getByText(blog.url)).toBeVisible()
@@ -45,24 +48,23 @@ test('pressing like twice calls event handler twice', async () => {
     likes: 246,
     user: { username: 'user', name: 'Testi Käyttäjä', id: '123' },
   }
-
-  const mockLikeHandler = vi.fn()
+  const onLike = vi.fn()
   const user = userEvent.setup()
 
   render(
     <Blog
       blog={blog}
       user={{ id: '123' }}
-      onLike={mockLikeHandler}
+      onLike={onLike}
       onDelete={() => {}}
     />
   )
+  const viewButton = screen.getByText('view')
+  const likeButton = screen.getByText('like')
 
-  await user.click(screen.getByText('view'))
-
-  const likeButton = screen.getByRole('button', { name: 'like' })
+  await user.click(viewButton)
   await user.click(likeButton)
   await user.click(likeButton)
 
-  expect(mockLikeHandler).toHaveBeenCalledTimes(2)
+  expect(onLike).toHaveBeenCalledTimes(2)
 })

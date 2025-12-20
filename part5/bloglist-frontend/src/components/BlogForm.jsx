@@ -6,31 +6,38 @@ const BlogForm = ({
   onTitleChange,
   onAuthorChange,
   onUrlChange,
-}) => (
-  <form onSubmit={onSubmit}>
-    <div>
-      <label>
-        Title:
-        <input value={title} onChange={onTitleChange} />
-      </label>
-    </div>
+}) => {
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    onSubmit({ title, author, url })
+  }
 
-    <div>
-      <label>
-        Author:
-        <input value={author} onChange={onAuthorChange} />
-      </label>
-    </div>
+  return (
+    <form onSubmit={handleSubmit}>
+      <div>
+        <label>
+          title:
+          <input type="text" value={title} onChange={onTitleChange} />
+        </label>
+      </div>
 
-    <div>
-      <label>
-        Url:
-        <input value={url} onChange={onUrlChange} />
-      </label>
-    </div>
+      <div>
+        <label>
+          author:
+          <input type="text" value={author} onChange={onAuthorChange} />
+        </label>
+      </div>
 
-    <button type="submit">Submit</button>
-  </form>
-)
+      <div>
+        <label>
+          url:
+          <input type="text" value={url} onChange={onUrlChange} />
+        </label>
+      </div>
+
+      <button type="submit">Submit</button>
+    </form>
+  )
+}
 
 export default BlogForm
