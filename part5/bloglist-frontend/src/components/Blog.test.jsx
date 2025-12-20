@@ -1,0 +1,18 @@
+import { render, screen } from '@testing-library/react'
+import Blog from './Blog'
+
+test('blog only displays title by default', () => {
+  const blog = {
+    title: 'Component testing is done with react-testing-library',
+    author: 'joulupukki',
+    url: 'example.com',
+    likes: 246,
+    user: { username: 'user', name: 'Testi Käyttäjä', id: '123' },
+  }
+
+  render(<Blog blog={blog} user={{ id: '123' }} />)
+  expect(screen.getAllByText(blog.title)[0]).toBeVisible()
+  expect(screen.getAllByText(blog.author)[0]).not.toBeVisible()
+  expect(screen.getByText(blog.url)).not.toBeVisible()
+  expect(screen.getByText(`likes ${blog.likes}`)).not.toBeVisible()
+})
