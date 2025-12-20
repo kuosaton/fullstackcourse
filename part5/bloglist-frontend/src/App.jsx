@@ -132,7 +132,7 @@ const App = () => {
       setPassword('')
       setBlogFormVisible(false)
 
-      showNotification(`Successfully logged in!`, true)
+      showNotification('Successfully logged in!', true)
     } catch (error) {
       const status = error.response?.status
       const backendMessage = error.response?.data?.error
@@ -155,7 +155,7 @@ const App = () => {
     event.preventDefault()
     localStorage.removeItem('loggedBlogappUser')
     setUser(null)
-    showNotification(`You have logged out.`, true)
+    showNotification('You have logged out.', true)
   }
 
   const loginForm = () => (
