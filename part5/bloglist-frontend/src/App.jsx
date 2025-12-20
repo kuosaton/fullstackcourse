@@ -78,6 +78,9 @@ const App = () => {
       {user && (
         <div>
           <p>{user.name} logged in</p>
+          <form onSubmit={window.localStorage.clear()}>
+            <button type="submit">logout</button>
+          </form>
         </div>
       )}
 
