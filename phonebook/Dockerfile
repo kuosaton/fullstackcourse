@@ -1,5 +1,4 @@
 FROM node:24-alpine AS build-stage
-# install frontend dependencies, run build, produce dist/
 
 WORKDIR /frontend
 
