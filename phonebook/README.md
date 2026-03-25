@@ -1,6 +1,6 @@
 # Phonebook
 
-A phonebook app for adding, deleting, and searching contacts by name and phone number. Includes input validation for empty or invalid inputs.
+A phonebook app for adding, deleting, and searching contacts by name and phone number. Includes input validation for empty or invalid inputs. Originally created as part of the course [Full Stack Open](https://fullstackopen.com/), with a further containerized deployment created as part of the course [DevOps with Docker](https://courses.mooc.fi/org/uh-cs/courses/devops-with-docker-spring-2026).
 
 ## Demo
 
