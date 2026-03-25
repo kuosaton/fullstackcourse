@@ -4,7 +4,7 @@ A phonebook app for adding, deleting, and searching contacts by name and phone n
 
 ## Demo
 
-A live version is available at <https://puhelinluettelo-nxad.onrender.com/>
+A live version is available at <https://phonebook-e81c.onrender.com>
 
 ## Prerequisites
 
