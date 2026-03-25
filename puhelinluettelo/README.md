@@ -2,6 +2,15 @@
 
 A phonebook app for adding, deleting, and searching contacts by name and phone number. Includes input validation for empty or invalid inputs.
 
+## Demo
+
+A live version is available at https://puhelinluettelo-nxad.onrender.com/
+
+## Prerequisites
+
+- [Docker](https://docs.docker.com/get-docker/)
+- A MongoDB instance (e.g., [MongoDB Atlas](https://www.mongodb.com/atlas))
+
 ## Docker
 
 Build:
