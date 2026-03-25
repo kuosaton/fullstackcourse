@@ -5,7 +5,6 @@ WORKDIR /frontend
 
 COPY frontend/package.json frontend/package-lock.json ./
 
-
 RUN <<EOF
   if [ -f package-lock.json ]; then npm ci;
   else npm i;
