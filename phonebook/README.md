@@ -9,7 +9,7 @@ A live version is available at <https://phonebook-e81c.onrender.com>
 ## Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/)
-- A MongoDB instance (e.g., [MongoDB Atlas](https://www.mongodb.com/atlas))
+- A MongoDB database (e.g., [MongoDB Atlas](https://www.mongodb.com/atlas))
 
 ## Usage
 
